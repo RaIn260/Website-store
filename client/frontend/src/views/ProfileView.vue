@@ -159,7 +159,6 @@ const save = async () => {
   font-size: 15px;
 }
 
-/* FORM */
 .form-block {
   flex: 1;
   max-width: 400px;
