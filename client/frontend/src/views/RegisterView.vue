@@ -102,6 +102,7 @@ const register = async () => {
 }
 </script>
 
+
 <style scoped>
 .container {
   height: 100vh;
