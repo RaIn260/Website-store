@@ -1,0 +1,20 @@
+/*Основной фон сайта*/
+
+body {
+  margin: 0;
+  padding: 0;
+
+  background: #0A0A0A;
+  color: #fff;
+
+  font-family: Brush Script MT, Brush Script Std, cursive;
+
+  /*Свечение на фоне*/
+  background-image:
+    radial-gradient(circle at center, rgba(239, 28, 45, 0.271) 0%, transparent 60%),
+    radial-gradient(circle at top left, rgba(0,0,0,0.8), transparent 40%),
+    radial-gradient(circle at top right, rgba(0,0,0,0.8), transparent 40%),
+    radial-gradient(circle at bottom left, rgba(0,0,0,0.8), transparent 40%),
+    radial-gradient(circle at bottom right, rgba(0,0,0,0.8), transparent 40%);
+}
+
