@@ -14,7 +14,7 @@ const supabase = createClient(
 
 // Проверка авторизации пользователя
 const authMiddleware = async (req, res, next) => {
-  
+
   const token = req.headers.authorization?.split(' ')[1]
 
   if (!token) {
@@ -144,6 +144,7 @@ console.log('UPDATE ERROR:', error)
 
   res.json(data[0])
 })
+
 
 // Получение всех товаров с бд
 app.get('/api/products', async (req, res) => {
