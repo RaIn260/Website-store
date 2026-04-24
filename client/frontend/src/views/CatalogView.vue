@@ -1,8 +1,6 @@
 <template>
   <div class="catalog">
 
-    <h1 class="title">Каталог</h1>
-
     <div class="grid">
       <div
         class="card"
@@ -16,6 +14,13 @@
         <p class="artist">{{ product.artist }}</p>
 
         <p class="price">{{ product.price }} ₽</p>
+
+        <button
+          class="add-btn"
+          @click.stop="addToCart(product)"
+        >
+           +
+        </button>
       </div>
     </div>
 
@@ -43,6 +48,13 @@ onMounted(async () => {
 const goToProduct = (id) => {
   console.log('Открыть товар:', id)
 }
+
+const addToCart = (product) => {
+  console.log('Добавлено в корзину:', product)
+
+  // пока просто заглушка
+}
+
 </script>
 
 <style scoped>
@@ -57,7 +69,7 @@ const goToProduct = (id) => {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
 }
 
@@ -66,18 +78,18 @@ const goToProduct = (id) => {
   border-radius: 12px;
   padding: 15px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: 0.4s;
 }
 
 .card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-10px);
 }
 
 .card img {
   width: 100%;
-  height: 200px;
+  height: 250px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .artist {
@@ -88,5 +100,29 @@ const goToProduct = (id) => {
 .price {
   margin-top: 10px;
   font-weight: bold;
+}
+
+.card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.add-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #22c55e;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.add-btn:hover {
+  background: #16a34a;
+  transform: scale(1.1);
 }
 </style>
