@@ -5,13 +5,15 @@ import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import CatalogView from '../views/CatalogView.vue'
+import CartView from '../views/CartView.vue'
 
 const routes = [
   { path: '/home', component: MainView },
   { path: '/', component: LoginView },
   { path: '/auth/register', component: RegisterView },
   { path: '/profile', component: ProfileView, meta: { requiresAuth: true } },
-  { path: '/catalog', component: CatalogView }
+  { path: '/catalog', component: CatalogView },
+  { path: '/cart', component: CartView }
 ]
 
 const router = createRouter({

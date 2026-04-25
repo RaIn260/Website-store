@@ -13,7 +13,7 @@
         <h3>{{ product.name }}</h3>
         <p class="artist">{{ product.artist }}</p>
 
-        <p class="price">{{ product.price }} ₽</p>
+        <p class="price">{{ product.price }} $</p>
 
         <button
           class="add-btn"
@@ -40,19 +40,32 @@ onMounted(async () => {
     const res = await axios.get('http://localhost:3000/api/products')
     products.value = res.data
   } catch (err) {
-    console.error('Ошибка загрузки товаров', err)
+    console.error('Ошибка загрузки товаров!', err)
   }
 })
 
-// пока просто заглушка
+
 const goToProduct = (id) => {
   console.log('Открыть товар:', id)
 }
 
-const addToCart = (product) => {
-  console.log('Добавлено в корзину:', product)
+const addToCart = async (product) => {
+  try {
+    const token = localStorage.getItem('token')
 
-  // пока просто заглушка
+    const res = await axios.post('http://localhost:3000/api/cart', {
+      product_id: product.id
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    console.log('CART RESPONSE:', res.data)
+
+  } catch (err) {
+    console.log('CART ERROR:', err.response?.data || err)
+  }
 }
 
 </script>
@@ -110,19 +123,19 @@ const addToCart = (product) => {
 }
 
 .add-btn {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: none;
-  background: #22c55e;
+  background: #ff0015;
   color: white;
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: 0.3s;
 }
 
 .add-btn:hover {
-  background: #16a34a;
-  transform: scale(1.1);
+  background: #b80312d2;
+  transform: scale(1.1);  /* увеличение на 10% */
 }
 </style>

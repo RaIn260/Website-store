@@ -225,3 +225,88 @@ app.delete('/api/products/:id', authMiddleware, async (req, res) => {
 
   res.json(data)
 })
+
+// Добавление товара в корзину
+app.post('/api/cart', authMiddleware, async (req, res) => {
+  const userId = req.user.id
+  const { product_id } = req.body
+
+  const { data: existing, error } = await supabase
+    .from('cart_items')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('product_id', product_id)
+
+  if (error) return res.status(400).json(error)
+
+  if (existing.length > 0) {
+    const { data, error } = await supabase
+      .from('cart_items')
+      .update({ quantity: existing[0].quantity + 1 })
+      .eq('id', existing[0].id)
+      .select()
+
+    return res.json(data)
+  }
+
+  const { data, error: insertError } = await supabase
+    .from('cart_items')
+    .insert([
+      {
+        user_id: userId,
+        product_id,
+        quantity: 1
+      }
+    ])
+    .select()
+
+  if (insertError) return res.status(400).json(insertError)
+
+  res.json(data)
+})
+
+// Получение товаров из корзины
+app.get('/api/cart', authMiddleware, async (req, res)=>{
+  const userId = req.user.id
+
+  const{ data, error} = await supabase
+  .from('cart_items')
+  .select(`
+    id,
+    quantity,
+    products(*)
+    `)
+  .eq('user_id', userId)
+
+  res.json(data)
+})
+
+// Удаление товара из корзины
+app.delete('/api/cart/:id', authMiddleware, async (req, res) => {
+  const { id } = req.params
+  const userId = req.user.id
+
+  // Проверка существует ли товар в корзине
+  const { data: existing, error: checkError } = await supabase
+    .from('cart_items')
+    .select('*')
+    .eq('id', id)
+    .eq('user_id', userId)
+
+  // Удаление
+  const { data, error } = await supabase
+    .from('cart_items')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', userId)
+    .select()
+
+  if (error) {
+    return res.status(400).json(error)
+  }
+
+  res.json({
+    success: true,
+    deleted: data
+  })
+})
