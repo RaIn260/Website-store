@@ -46,10 +46,11 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
+import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const email = ref('')
 const password = ref('')
@@ -70,10 +71,10 @@ const register = async () => {
   }
 
   try {
-    await axios.post('/api/auth/register', {
-      email: email.value,
-      password: password.value
-    })
+    await authStore.register(
+    email.value,
+    password.value
+    )
 
     success.value = true
     error.value = ''

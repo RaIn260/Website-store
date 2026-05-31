@@ -113,10 +113,6 @@ app.get('/api/users/me', authMiddleware, async (req, res) => {
   res.json(data)
 })
 
-app.listen(3000, () => {
-  console.log('Server started on http://localhost:3000')
-})
-
 // Обновление личной информации пользователя(защищен)
 app.patch('/api/users/me', authMiddleware, async (req, res) => {
   const { name, phone} = req.body
@@ -309,4 +305,8 @@ app.delete('/api/cart/:id', authMiddleware, async (req, res) => {
     success: true,
     deleted: data
   })
+})
+
+app.listen(3000, () => {
+  console.log('Server started on http://localhost:3000')
 })

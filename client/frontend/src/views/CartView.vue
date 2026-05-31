@@ -7,10 +7,13 @@
       Корзина пуста...
     </p>
 
-    <!-- Список товаров -->
     <div v-else class="cart-list">
 
-      <div class="cart-item" v-for="item in cart" :key="item.id">
+      <div
+        class="cart-item"
+        v-for="item in cart"
+        :key="item.id"
+      >
 
         <img :src="item.image_url" />
 
@@ -20,14 +23,18 @@
           <p>{{ item.price }} $</p>
         </div>
 
-        <!-- Количество товара -->
         <div class="quantity">
           <button @click="decrease(item)">-</button>
+
           <span>{{ item.quantity }}</span>
+
           <button @click="increase(item)">+</button>
         </div>
 
-        <button class="remove" @click="remove(item.cart_id)">
+        <button
+          class="remove"
+          @click="remove(item.cart_id)"
+        >
           ✖
         </button>
 
@@ -35,40 +42,37 @@
 
     </div>
 
-    <!-- Общая стоимость -->
-    <div v-if="cart.length > 0" class="total">
+    <div
+      v-if="cart.length > 0"
+      class="total"
+    >
       <h2>К оформлению: {{ totalPrice }} $</h2>
+
+      <button
+        class="checkout-btn"
+        @click="goToCheckout"
+      >
+        Оформить заказ
+      </button>
     </div>
 
   </div>
 </template>
 
 <script setup>
-import axios from 'axios'
-import { ref, onMounted, computed } from 'vue'
+import { computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useCartStore } from '../stores/cart'
 
-const cart = ref([])
+const router = useRouter()
+const cartStore = useCartStore()
+
+const cart = computed(() => cartStore.cart)
+
+const totalPrice = computed(() => cartStore.totalPrice)
 
 onMounted(async () => {
-  const token = localStorage.getItem('token')
-
-  const res = await axios.get('http://localhost:3000/api/cart', {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
-
-  cart.value = res.data.map(item => ({
-  cart_id: item.id,        
-  quantity: item.quantity,
-  ...item.products 
- }))
-})
-
-const totalPrice = computed(() => {
-  return cart.value.reduce((sum, item) => {
-    return sum + item.price * item.quantity
-  }, 0)
+  await cartStore.fetchCart()
 })
 
 const increase = (item) => {
@@ -79,27 +83,26 @@ const decrease = (item) => {
   if (item.quantity > 1) {
     item.quantity--
   } else {
-    remove(item.id)
+    remove(item.cart_id)
   }
 }
 
 const remove = async (id) => {
-  const token = localStorage.getItem('token')
-
-  await axios.delete(`http://localhost:3000/api/cart/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
-
-  cart.value = cart.value.filter(item => item.cart_id !== id)
+  await cartStore.removeFromCart(id)
 }
 
+const goToCheckout = () => {
+  router.push('/checkout')
+}
 </script>
 
 <style scoped>
 .cart-page {
   padding: 40px;
+}
+
+h1 {
+  margin-bottom: 30px;
 }
 
 .empty {
@@ -115,7 +118,7 @@ const remove = async (id) => {
 }
 
 .cart-item {
-  display: flex;  /* в строку */ 
+  display: flex;
   align-items: center;
   background: #130000;
   padding: 20px;
@@ -155,11 +158,36 @@ const remove = async (id) => {
 }
 
 .remove:hover {
-  color: #b80312d2; 
+  color: #b80312d2;
 }
 
 .total {
-  margin-top: 30px;
-  font-size: 20px;
+  margin-top: 40px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.checkout-btn {
+  padding: 14px 28px;
+
+  background: #ff0015;
+  color: white;
+
+  border: none;
+  border-radius: 12px;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.checkout-btn:hover {
+  background: #b80312d2;
+  transform: translateY(-2px);
 }
 </style>

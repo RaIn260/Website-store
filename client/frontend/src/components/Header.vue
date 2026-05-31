@@ -9,23 +9,35 @@
 
       <!-- Меню -->
       <nav class="nav">
-        <span @click="$router.push('/catalog')">Каталог</span>
-        <span @click="$router.push('/search')">Поиск</span>
+        <span @click="$router.push('/catalog')">
+          Каталог
+        </span>
+
       </nav>
 
-      <!-- ПРАВАЯ ЧАСТЬ -->
+      <!-- Правая часть -->
       <div class="actions">
 
         <!-- Корзина -->
-        <div class="cart" @click="$router.push('/cart')">
+        <div
+          class="cart"
+          @click="$router.push('/cart')"
+        >
           🛒
-          <span v-if="cartCount > 0" class="cart-count">
+
+          <span
+            v-if="cartCount > 0"
+            class="cart-count"
+          >
             {{ cartCount }}
           </span>
         </div>
 
-        <!-- Кнопка войти(пока профиль) -->
-        <button class="login-btn" @click="goToLogin">
+        <!-- Профиль -->
+        <button
+          class="login-btn"
+          @click="goToLogin"
+        >
           Профиль
         </button>
 
@@ -36,21 +48,30 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useCartStore } from '../stores/cart'
+import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
 
-// Проверка авторизован ли пользователь
-const isAuth = computed(() => !!localStorage.getItem('token'))
+const cartStore = useCartStore()
+const authStore = useAuthStore()
+
+const cartCount = computed(() => {
+  return cartStore.cart.reduce((sum, item) => {
+    return sum + item.quantity
+  }, 0)
+})
 
 const goToLogin = () => {
-  if (isAuth.value) {
+  if (authStore.isAuthenticated) {
     router.push('/profile')
   } else {
     router.push('/')
   }
 }
+
 </script>
 
 <style scoped>
@@ -69,6 +90,7 @@ const goToLogin = () => {
 
 .header-inner {
   max-width: 1200px;
+
   margin: 0 auto;
   padding: 15px 20px;
 
@@ -81,17 +103,24 @@ const goToLogin = () => {
   font-size: 30px;
   font-weight: 200;
   letter-spacing: 3px;
+
   display: flex;
   align-items: center;
   gap: 6px;
+
+  cursor: pointer;
 }
 
 .logo::before {
   content: "";
+
   width: 10px;
   height: 10px;
+
   background: #fd0015;
+
   border-radius: 80%;
+
   box-shadow: 0 0 10px #fe0015;
 }
 
@@ -105,9 +134,9 @@ const goToLogin = () => {
 }
 
 .nav span {
-  color: #fff;
+  color: white;
   cursor: pointer;
-  transition: 0.5s;
+  transition: 0.3s;
 }
 
 .nav span:hover {
@@ -120,27 +149,82 @@ const goToLogin = () => {
   gap: 20px;
 }
 
+/* КОРЗИНА */
+
 .cart {
   position: relative;
-  font-size: 20px;
+
+  font-size: 24px;
   cursor: pointer;
-  color: #fff;
+
+  color: white;
 }
+
+.cart-count {
+  position: absolute;
+
+  top: -8px;
+  right: -12px;
+
+  min-width: 20px;
+  height: 20px;
+
+  padding: 0 4px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #ff0015;
+  color: white;
+
+  border-radius: 50%;
+
+  font-size: 12px;
+  font-weight: bold;
+
+  box-shadow: 0 0 10px rgba(255, 0, 21, 0.6);
+}
+
+/* КНОПКА */
 
 .login-btn {
   padding: 8px 16px;
 
   background: transparent;
-  color: #fff;
+  color: white;
 
   border: 1px solid #ff00156d;
   border-radius: 8px;
 
   cursor: pointer;
-  transition: 0.5s;
+
+  transition: 0.3s;
 }
 
 .login-btn:hover {
   background: #ff0015;
 }
+
+.search-input {
+  width: 300px;
+
+  padding: 10px 16px;
+
+  background: rgba(17, 17, 17, 0.95);
+
+  color: white;
+
+  border: 1px solid rgba(255, 0, 21, 0.25);
+  border-radius: 12px;
+
+  outline: none;
+
+  transition: .3s;
+
+  box-shadow:
+    0 0 15px rgba(255,0,21,.05),
+    inset 0 0 10px rgba(255,255,255,.03);
+}
+
 </style>

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
 import MainView from '../views/MainView.vue'
 import LoginView from '../views/LoginView.vue'
@@ -6,6 +7,8 @@ import RegisterView from '../views/RegisterView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import CatalogView from '../views/CatalogView.vue'
 import CartView from '../views/CartView.vue'
+import CheckoutView from '../views/CheckoutView.vue'
+
 
 const routes = [
   { path: '/home', component: MainView },
@@ -13,7 +16,8 @@ const routes = [
   { path: '/auth/register', component: RegisterView },
   { path: '/profile', component: ProfileView, meta: { requiresAuth: true } },
   { path: '/catalog', component: CatalogView },
-  { path: '/cart', component: CartView }
+  { path: '/cart', component: CartView },
+   { path: '/checkout', component: CheckoutView}
 ]
 
 const router = createRouter({
@@ -21,27 +25,24 @@ const router = createRouter({
   routes
 })
 
-import axios from 'axios'
-
 router.beforeEach(async (to, from, next) => {
-  const token = localStorage.getItem('token')
+
+  const authStore = useAuthStore()
 
   if (to.meta.requiresAuth) {
-    if (!token) return next('/')
 
-    try {
-      await axios.get('http://localhost:3000/api/users/me', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
+    if (!authStore.token) {
+      return next('/')
+    }
 
-      next()
-    } catch {
-      localStorage.removeItem('token') 
-      next('/')   
-     }
+    if (!authStore.user) {
+      await authStore.getMe()
+    }
+
+    next()
+
   } else {
+
     next()
   }
 })

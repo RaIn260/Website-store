@@ -36,10 +36,11 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
+import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const email = ref('')
 const password = ref('')
@@ -50,21 +51,22 @@ const clearError = () => {
 }
 
 const login = async () => {
+
   try {
-    const res = await axios.post('/api/auth/login', {
-      email: email.value,
-      password: password.value
-    })
 
-    localStorage.setItem('token', res.data.session.access_token)
-
-    localStorage.setItem('email', email.value)
+    await authStore.login(
+      email.value,
+      password.value
+    )
 
     router.push('/profile')
-  } catch (err) {
+
+  } catch {
+
     error.value = '❌ Пользователь не найден или неверный пароль'
   }
 }
+
 </script>
 
 <style scoped>
