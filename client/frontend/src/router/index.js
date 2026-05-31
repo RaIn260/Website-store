@@ -8,7 +8,7 @@ import ProfileView from '../views/ProfileView.vue'
 import CatalogView from '../views/CatalogView.vue'
 import CartView from '../views/CartView.vue'
 import CheckoutView from '../views/CheckoutView.vue'
-
+import ProductView from '../views/ProductView.vue'
 
 const routes = [
   { path: '/home', component: MainView },
@@ -17,7 +17,8 @@ const routes = [
   { path: '/profile', component: ProfileView, meta: { requiresAuth: true } },
   { path: '/catalog', component: CatalogView },
   { path: '/cart', component: CartView },
-   { path: '/checkout', component: CheckoutView}
+  { path: '/checkout', component: CheckoutView},
+  { path: '/product/:id', component: ProductView}
 ]
 
 const router = createRouter({

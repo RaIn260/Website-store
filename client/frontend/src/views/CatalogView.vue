@@ -127,7 +127,7 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
 import { useProductsStore } from '../stores/products'
 import { useCartStore } from '../stores/cart'
@@ -136,6 +136,7 @@ const productsStore = useProductsStore()
 const cartStore = useCartStore()
 
 const route = useRoute()
+const router = useRouter()
 
 const search = ref('')
 const selectedArtist = ref('')
@@ -217,7 +218,7 @@ const resetFilters = () => {
 }
 
 const goToProduct = (id) => {
-  console.log('Открыть товар:', id)
+  router.push(`/product/${id}`)
 }
 
 const addToCart = async (product) => {
