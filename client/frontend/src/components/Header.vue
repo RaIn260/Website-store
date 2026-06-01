@@ -37,12 +37,36 @@
         </div>
 
         <!-- Профиль -->
-        <button
-          class="login-btn"
-          @click="goToLogin"
+        <div
+          class="user-info"
+         @click="goToLogin"
         >
-          Профиль
-        </button>
+          <template v-if="authStore.isAuthenticated && authStore.user">
+
+            <div class="avatar">
+              {{
+                authStore.user.name
+                ? authStore.user.name[0].toUpperCase()
+                : authStore.user.email[0].toUpperCase()
+              }}
+            </div>
+
+            <span class="user-name">
+              {{
+                authStore.isAdmin
+                ? 'Админ'
+                : (authStore.user.name || authStore.user.email)
+              }}
+            </span>
+
+            </template>
+
+          <template v-else>
+            <button class="login-btn">
+              Вход
+            </button>
+          </template>
+        </div>
 
       </div>
 
@@ -51,7 +75,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart'
 import { useAuthStore } from '../stores/auth'
@@ -60,6 +84,15 @@ const router = useRouter()
 
 const cartStore = useCartStore()
 const authStore = useAuthStore()
+
+onMounted(async () => {
+  if (
+    authStore.isAuthenticated &&
+    !authStore.user
+  ) {
+    await authStore.getMe()
+  }
+})
 
 const cartCount = computed(() => {
   return cartStore.cart.reduce((sum, item) => {
@@ -207,5 +240,45 @@ const goToLogin = () => {
 
 .login-btn:hover {
   background: #ff0015;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(
+    135deg,
+    #ff0015,
+    #7a000b
+  );
+
+  color: white;
+  font-weight: bold;
+
+  box-shadow:
+    0 0 10px rgba(255, 0, 21, 0.4);
+}
+
+.user-name {
+  color: white;
+  font-size: 14px;
+  max-width: 120px;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

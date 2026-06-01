@@ -3,11 +3,7 @@
 
     <!-- ШАПКА -->
     <header class="admin-header">
-      <h1>M-DROP Admin</h1>
-
-      <div class="role">
-        Admin
-      </div>
+      <h2>M-DROP редакция каталога</h2>
     </header>
 
     <!-- КНОПКА ДОБАВИТЬ -->
