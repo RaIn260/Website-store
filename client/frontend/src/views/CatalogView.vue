@@ -271,6 +271,9 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.mobile-filter-btn {
+  display: none;
+}
 .catalog-page {
   display: flex;
   gap: 30px;
@@ -406,7 +409,7 @@ onUnmounted(() => {
     font-weight: bold;
   }
 
-  /* ===== SIDEBAR КАК DRAWER ===== */
+
   .sidebar {
     position: fixed;
     top: 0;
