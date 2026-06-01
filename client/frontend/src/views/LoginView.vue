@@ -1,36 +1,50 @@
 <template>
-  <div class="container">
+  <div class="login-page">
 
-    <div class="card">
-      <h1>Вход</h1>
+    <div class="overlay"></div>
 
-      <input
-        v-model="email"
-        type="email"
-        placeholder="Email"
-        @input="clearError"
-      />
+    <div class="login-wrapper">
 
-      <input
-        v-model="password"
-        type="password"
-        placeholder="Пароль"
-        @input="clearError"
-      />
+      <!-- БРЕНД (подняли + увеличили) -->
+      <div class="brand">
+        <span class="brand-dot"></span>
+        M-DROP
+      </div>
 
-      <button class="btn" @click="login">
-        Войти
-      </button>
+      <div class="card">
 
-      
-      <p v-if="error" class="error">
-        {{ error }}
-      </p>
+        <h1>Вход</h1>
 
-      <p class="link" @click="$router.push('/auth/register')">
-        Нет аккаунта? Зарегистрироваться
-      </p>
+        <input
+          v-model="email"
+          type="email"
+          placeholder="Email"
+          @input="clearError"
+        />
+
+        <input
+          v-model="password"
+          type="password"
+          placeholder="Пароль"
+          @input="clearError"
+        />
+
+        <button class="btn" @click="login">
+          Войти
+        </button>
+
+        <p v-if="error" class="error">
+          {{ error }}
+        </p>
+
+        <p class="link" @click="$router.push('/auth/register')">
+          Нет аккаунта? Зарегистрироваться
+        </p>
+
+      </div>
+
     </div>
+
   </div>
 </template>
 
@@ -76,65 +90,163 @@ const login = async () => {
 </script>
 
 <style scoped>
-.container {
+
+.login-page {
   height: 100vh;
+
   display: flex;
-  justify-content: center;
   align-items: center;
-  background: #f3f4f6;
+  justify-content: center;
+
+  position: relative;
+
+  background: url("https://images.openai.com/static-rsc-4/4-a4pEc-Zk3nENCsE97UZeLNDYEs33jHQUgBgHa99mRxScuzkVw2j5oMsDOVOQYco1t4T0Y8cax4ezzsURdOHwHGLks2KCI1BRWRtWPb1ExZkAW0T2twdJv_b3dI2Gf6PvaehuySGT2H6cph51_8xra-XuQCGxAISUu1_aV2gUWUTMRc2kcLpkHZEunKx_Ne?purpose=inline")
+    center/cover no-repeat;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(circle at top,
+      rgba(255, 0, 21, 0.25),
+      transparent 60%),
+    rgba(0, 0, 0, 0.55);
+}
+
+.login-wrapper {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.brand {
+  font-size: 42px;       /* ↑ больше */
+  letter-spacing: 10px;  /* стильнее */
+  font-weight: 200;
+
+  color: white;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  margin-bottom: 10px;   /* ↑ выше от карточки */
+
+  text-shadow:
+    0 0 10px rgba(255, 0, 21, 0.4),
+    0 0 30px rgba(255, 0, 21, 0.2);
+}
+
+.brand-dot {
+  width: 12px;
+  height: 12px;
+
+  border-radius: 50%;
+  background: #ff0015;
+
+  box-shadow: 0 0 12px #ff0015;
 }
 
 .card {
-  width: 320px;
+  width: 340px;
+
   padding: 30px;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 15px 15px 15px rgba(0,0,0,0.3);
+
+  background: rgba(17, 17, 17, 0.85);
+  border: 1px solid rgba(255, 0, 21, 0.25);
+
+  border-radius: 14px;
+
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+
   text-align: center;
 }
 
-input {
-  width: 90%;
-  padding: 10px;
-  margin: 8px 0px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+h1 {
+  color: white;
+  margin-bottom: 20px;
+  font-size: 26px;
 }
 
+/* inputs */
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+
+  background: #1b1b1b;
+  border: 1px solid #333;
+  border-radius: 10px;
+
+  color: white;
+  outline: none;
+}
+
+input:focus {
+  border-color: #ff0015;
+  box-shadow: 0 0 10px rgba(255, 0, 21, 0.2);
+}
+
+/* button */
 .btn {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
+
   margin-top: 10px;
-  background: #b91c1c;
+
+  background: linear-gradient(135deg, #ff0015, #7a000b);
   color: white;
+
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
+
   cursor: pointer;
+
+  transition: 0.3s;
 }
 
 .btn:hover {
-  background: #a50707;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255, 0, 21, 0.2);
 }
 
-h1 {
-  font-family: 'Сans-serif', sans-serif;
-  color: #111827;
-  font-size: 30px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  margin-bottom: 20px;
-}
-
-.link {
+/* error */
+.error {
   margin-top: 10px;
+  color: #ff3b3b;
   font-size: 13px;
-  color: #150000a0;
+}
+
+/* link */
+.link {
+  margin-top: 12px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
   cursor: pointer;
 }
 
-.error {
-  margin-top: 10px;
-  color: #dc2626;
-  font-size: 13px;
+.link:hover {
+  color: #ff0015;
 }
+
+/* mobile */
+@media (max-width: 480px) {
+
+  .brand {
+    font-size: 28px;
+    letter-spacing: 6px;
+  }
+
+  .card {
+    width: 90%;
+    padding: 20px;
+  }
+}
+
 </style>

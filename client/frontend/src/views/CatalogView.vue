@@ -1,9 +1,12 @@
 <template>
   <div class="catalog-page">
 
-    <!-- ФИЛЬТРЫ -->
-    <aside class="sidebar">
+    <button class="mobile-filter-btn" @click="showFilters = !showFilters">
+      Фильтры
+    </button>
 
+    <!-- ФИЛЬТРЫ -->
+    <aside class="sidebar" :class="{ open: showFilters }">
       <div class="filter-block">
         <label>Поиск товара</label>
 
@@ -134,7 +137,7 @@
 </template>
 
 <script setup>
-import {ref, computed, onMounted, watch} from 'vue'
+import {ref, computed, onMounted, onUnmounted, watch} from 'vue'
 
 import { useRouter } from 'vue-router'
 
@@ -154,6 +157,8 @@ const selectedCategory = ref('')
 const minPrice = ref(0)
 const maxPrice = ref(100000)
 const sortType = ref('')
+
+const showFilters = ref(false)
 
 onMounted(async () => {
   await productsStore.fetchProducts()
@@ -249,6 +254,20 @@ const addToCart = async (product) => {
     console.log(err)
   }
 }
+
+const handleEsc = (e) => {
+  if (e.key === 'Escape') {
+    showFilters.value = false
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleEsc)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleEsc)
+})
 </script>
 
 <style scoped>
@@ -365,366 +384,75 @@ const addToCart = async (product) => {
 .reset-btn:hover {
   background: #ff0015;
 }
+
+@media (max-width: 480px) {
+
+  .catalog-page {
+    flex-direction: column;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  /* кнопка фильтров */
+  .mobile-filter-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 10px;
+    background: #ff0015;
+    color: white;
+    font-weight: bold;
+  }
+
+  /* ===== SIDEBAR КАК DRAWER ===== */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 85%;
+    max-width: 320px;
+    height: 100vh;
+
+    background: #111;
+    padding: 20px;
+    z-index: 1000;
+
+    transform: translateX(-100%);
+    transition: 0.3s ease;
+
+    overflow-y: auto;
+    border-radius: 0;
+  }
+
+  /* открыто */
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* затемнение фона */
+  .sidebar.open::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    background: rgba(0,0,0,0.6);
+    z-index: -1;
+  }
+
+  /* товары */
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .card img {
+    height: 160px;
+  }
+}
 </style>
-
-вот мой бэк:
-const express = require('express')
-const cors = require('cors')
-const bodyParser = require('body-parser')  // чтобы считать req.body
-const { createClient } = require('@supabase/supabase-js')
-
-const app = express()
-app.use(cors())
-app.use(bodyParser.json())
-
-const supabase = createClient(
-  'https://ebshahisftvdcmgkhgzp.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVic2hhaGlzZnR2ZGNtZ2toZ3pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNTkxMjEsImV4cCI6MjA5MDczNTEyMX0.PRnN6LGlZ7z9ZUG3DgCtT1h1B9jAIYTl75WeUy5nZ_s'
-)
-
-// Проверка авторизации пользователя
-const authMiddleware = async (req, res, next) => {
-
-  const token = req.headers.authorization?.split(' ')[1]
-
-  if (!token) {
-    return res.status(401).json({ message: 'No token provided' })
-  }
-
-  const { data, error } = await supabase.auth.getUser(token)
-
-  if (error || !data?.user) {
-    return res.status(401).json({ message: 'Unauthorized' })
-  }
-
-  req.user = data.user
-  next()
-}
-
-// Регистрация
-app.post('/api/auth/register', async (req, res) => {
-  const { email, password } = req.body
-
-  console.log("REGISTER REQUEST:", email, password)
-
-  // Валидация
-
-  if(!email || !password){
-    return res.status(400).json({message: 'Email и пароль обязательны!'})
-  }
-
-  if(password.length < 6){
-    return res.status(400).json({message: 'Пароль должен быть не менее 6 символов!'}) 
-  }
-
-  if (!email.includes('@') || !email.includes('.com')) {
-    return res.status(400).json({ message: 'Email введен некорректно!' })
-  }
-
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password
-  })
-
-  console.log("REGISTER DATA:", data)
-  console.log("REGISTER ERROR:", error)
-
-  if (error) {
-  return res.status(400).json({
-    message: error.message
-  })
-}
-
-const { data: insertData, error: insertError } = await supabase.from('users').insert([
-  {
-    id: data.user.id,
-    email: data.user.email,
-    name: '',
-    phone: ''
-  }
-])
-
-console.log('INSERT ERROR:', insertError)
-console.log('INSERT DATA:', insertData)
-
-  res.json(data)
-})
-
-// Вход
-app.post('/api/auth/login', async (req, res) => {
-  const { email, password } = req.body
-
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  })
-
-  if (error) {
-    return res.status(400).json({
-      message: error.message
-    })
-  }
-
-  res.json(data)
-})
-
-// Получение информации о текущем пользователе
-app.get('/api/users/me', authMiddleware, async (req, res) => {
-  const userId = req.user.id
-
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', userId)
-    .single()
-
-  if (error) return res.status(400).json(error)
-
-  res.json(data)
-})
-
-// Обновление личной информации пользователя(защищен)
-app.patch('/api/users/me', authMiddleware, async (req, res) => {
-  const { name, phone} = req.body
-
-  const userId = req.user.id
-  console.log('USER ID:', req.user.id)
-
-  const{data, error} = await supabase
-  .from('users')
-  .update({name, phone})
-  .eq('id', userId)
-  .select()
-
-if (error) {
-  console.log('SUPABASE ERROR FULL:', error)
-  return res.status(400).json({
-    message: error.message,
-    details: error.details,
-    hint: error.hint
-  })
-}
-
-console.log('UPDATE RESULT:', data)
-console.log('UPDATE ERROR:', error)
-
-  res.json(data[0])
-})
-
-
-// Получение всех товаров с бд
-app.get('/api/products', async (req, res) => {
-
-  const { search } = req.query
-
-  let query = supabase
-    .from('products')
-    .select('*')
-
-  if (search) {
-    query = query.ilike('name', `%${search}%`)
-  }
-
-  const { data, error } = await query.order(
-    'created_at',
-    { ascending: false }
-  )
-
-  if (error) {
-    return res.status(400).json(error)
-  }
-
-  res.json(data)
-})
-
-// Получение определенного товара(по id)
-app.get('/api/products/:id', async (req, res) => {
-  const { id } = req.params  // беру id из URL
-
-  const { data, error } = await supabase
-  .from('products')
-  .select('*')
-  .eq('id', id)
-  .single()
-
-  if(error) return res.status(400).json(error)
-
-    res.json(data)
-})
-
-// Создание товара(защищен)
-app.post('/api/products', authMiddleware, async (req, res) => {
-  const { name, artist, price, category, image_url, stock, description } = req.body
-
-  const { data, error} = await supabase
-  .from('products')
-  .insert([
-    {
-      name,
-      artist,
-      price,
-      category,
-      image_url,
-      stock,
-      description
-    }
-  ])
-  .select()
-
-  if(error) return res.status(400).json(error)
-
-  res.json(data)
-})
-
-// Обновление товара(защищен)
-app.patch('/api/products/:id', authMiddleware, async (req, res) => {
-  const{ id } = req.params
-
-  const{ data, error} = await supabase
-  .from('products')
-  .update(req.body)
-  .eq('id', id)
-  .select()
-
-  if(error) return res.status(400).json(error)
-
-  res.json(data)
-})
-
-// Удаление товара(защищен)
-app.delete('/api/products/:id', authMiddleware, async (req, res) => {
-  const{ id } = req.params
-
-  const{data, error} = await supabase
-  .from('products')
-  .delete()
-  .eq('id', id)
-
-  if(error) return res.status(400).json(error)
-
-  res.json(data)
-})
-
-// Добавление товара в корзину
-app.post('/api/cart', authMiddleware, async (req, res) => {
-  const userId = req.user.id
-  const { product_id } = req.body
-
-  const { data: existing, error } = await supabase
-    .from('cart_items')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('product_id', product_id)
-
-  if (error) return res.status(400).json(error)
-
-  if (existing.length > 0) {
-    const { data, error } = await supabase
-      .from('cart_items')
-      .update({ quantity: existing[0].quantity + 1 })
-      .eq('id', existing[0].id)
-      .select()
-
-    return res.json(data)
-  }
-
-  const { data, error: insertError } = await supabase
-    .from('cart_items')
-    .insert([
-      {
-        user_id: userId,
-        product_id,
-        quantity: 1
-      }
-    ])
-    .select()
-
-  if (insertError) return res.status(400).json(insertError)
-
-  res.json(data)
-})
-
-// Получение товаров из корзины
-app.get('/api/cart', authMiddleware, async (req, res)=>{
-  const userId = req.user.id
-
-  const{ data, error} = await supabase
-  .from('cart_items')
-  .select(`
-    id,
-    quantity,
-    products(*)
-    `)
-  .eq('user_id', userId)
-
-  res.json(data)
-})
-
-// Удаление товара из корзины
-app.delete('/api/cart/:id', authMiddleware, async (req, res) => {
-  const { id } = req.params
-  const userId = req.user.id
-
-  // Проверка существует ли товар в корзине
-  const { data: existing, error: checkError } = await supabase
-    .from('cart_items')
-    .select('*')
-    .eq('id', id)
-    .eq('user_id', userId)
-
-  // Удаление
-  const { data, error } = await supabase
-    .from('cart_items')
-    .delete()
-    .eq('id', id)
-    .eq('user_id', userId)
-    .select()
-
-  if (error) {
-    return res.status(400).json(error)
-  }
-
-  res.json({
-    success: true,
-    deleted: data
-  })
-})
-
-app.listen(3000, () => {
-  console.log('Server started on http://localhost:3000')
-})
-
-вот мой продукт.джс:
-import { defineStore } from 'pinia'
-import api from '../api/axios'
-
-export const useProductsStore = defineStore('products', {
-
-  state: () => ({
-    products: [],
-    loading: false
-  }),
-
-  actions: {
-
-    async fetchProducts(search = '') {
-
-      try {
-
-        this.loading = true
-
-        const res = await api.get('/api/products',{params: {search}}
-        )
-
-        this.products = res.data
-      } catch (err) {
-
-        console.log(err)
-
-      } finally {
-
-        this.loading = false
-      }
-    }
-  }
-})

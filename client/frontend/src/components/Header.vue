@@ -281,4 +281,58 @@ const goToLogin = () => {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+@media (max-width: 480px) {
+
+  .header-inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  /* логотип чуть компактнее */
+  .logo {
+    font-size: 18px;
+    letter-spacing: 2px;
+  }
+
+  /* меню НЕ в колонку, а в ряд */
+  .nav {
+    gap: 12px;
+    font-size: 12px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  /* действия справа */
+  .actions {
+    gap: 10px;
+    width: auto;
+  }
+
+  /* скрываем имя пользователя (у тебя уже было) */
+  .user-name {
+    display: none;
+  }
+
+  /* уменьшаем корзину */
+  .cart {
+    font-size: 20px;
+  }
+
+  .cart-count {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    top: -6px;
+    right: -10px;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
 </style>
