@@ -134,20 +134,17 @@
 </template>
 
 <script setup>
-import {
-  ref,
-  computed,
-  onMounted,
-  watch
-} from 'vue'
+import {ref, computed, onMounted, watch} from 'vue'
 
 import { useRouter } from 'vue-router'
 
+import { useAuthStore } from '../stores/auth'
 import { useProductsStore } from '../stores/products'
 import { useCartStore } from '../stores/cart'
 
 const router = useRouter()
 
+const authStore = useAuthStore()
 const productsStore = useProductsStore()
 const cartStore = useCartStore()
 
@@ -239,6 +236,13 @@ const goToProduct = (id) => {
 }
 
 const addToCart = async (product) => {
+
+  if (!authStore.isAuthenticated) {
+    alert('Для добавления товара в корзину необходимо войти в аккаунт')
+    router.push('/auth/login')
+    return
+  }
+
   try {
     await cartStore.addToCart(product.id)
   } catch (err) {

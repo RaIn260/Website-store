@@ -64,9 +64,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 import { useCartStore } from '../stores/cart'
 
 const route = useRoute()
+
+const authStore = useAuthStore()
 const cartStore = useCartStore()
 
 const product = ref(null)
@@ -81,6 +84,13 @@ onMounted(async () => {
 })
 
 const addToCart = async () => {
+
+  if (!authStore.isAuthenticated) {
+    alert('Для добавления товара в корзину необходимо войти в аккаунт')
+    router.push('/auth/login')
+    return
+  }
+
   await cartStore.addToCart(product.value.id)
 }
 </script>

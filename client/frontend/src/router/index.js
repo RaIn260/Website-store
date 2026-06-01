@@ -17,7 +17,7 @@ const routes = [
   { path: '/auth/register', component: RegisterView },
   { path: '/profile', component: ProfileView, meta: { requiresAuth: true } },
   { path: '/catalog', component: CatalogView },
-  { path: '/cart', component: CartView },
+  { path: '/cart', component: CartView, meta: { requiresAuth: true } },
   { path: '/checkout', component: CheckoutView},
   { path: '/product/:id', component: ProductView},
   {path: '/admin', name: 'admin', component: () => import('../views/AdminView.vue'), meta: { requiresAdmin: true }}
@@ -31,10 +31,9 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
-  // 🔐 AUTH CHECK
   if (to.meta.requiresAuth) {
     if (!authStore.token) {
-      return next('/')
+      return next('/auth/login')
     }
 
     if (!authStore.user) {
@@ -42,7 +41,6 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  // 👑 ADMIN CHECK
   if (to.meta.requiresAdmin) {
     const user = authStore.user || JSON.parse(localStorage.getItem('user'))
 
