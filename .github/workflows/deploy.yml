@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          working-directory: './client/frontend'
+          cache-dependency-path: './client/frontend/package-lock.json'
       
       - name: Install dependencies
         working-directory: './client/frontend'
