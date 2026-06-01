@@ -86,7 +86,7 @@ const register = async () => {
 
     // переход на login
     setTimeout(() => {
-      router.push('/')
+      router.push('/auth/login')
     }, 1000)
 
   } catch (err) {

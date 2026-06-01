@@ -3,7 +3,7 @@
     <div class="header-inner">
 
       <!-- Логотип -->
-      <div class="logo" @click="$router.push('/home')">
+      <div class="logo" @click="$router.push('/')">
         <span class="logo-main">M</span>-DROP
       </div>
 
@@ -104,7 +104,7 @@ const goToLogin = () => {
   if (authStore.isAuthenticated) {
     router.push('/profile')
   } else {
-    router.push('/')
+    router.push('/auth/login')
   }
 }
 

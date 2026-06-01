@@ -23,7 +23,7 @@ onMounted(async () => {
 })
 
 const showHeader = computed(() => {
-  return route.path !== '/' && route.path !== '/auth/register'
+  return route.path !== '/auth/login' && route.path !== '/auth/register'
 })
 </script>
 

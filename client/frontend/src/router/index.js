@@ -12,8 +12,8 @@ import ProductView from '../views/ProductView.vue'
 import { isAdmin } from '../utils/admin'
 
 const routes = [
-  { path: '/home', component: MainView },
-  { path: '/', component: LoginView },
+  { path: '/', component: MainView },
+  { path: '/auth/login', component: LoginView },
   { path: '/auth/register', component: RegisterView },
   { path: '/profile', component: ProfileView, meta: { requiresAuth: true } },
   { path: '/catalog', component: CatalogView },
