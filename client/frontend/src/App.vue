@@ -1,5 +1,6 @@
 <script setup>
 import Header from './components/Header.vue'
+import Footer from './components/Footer.vue'
 import { useRoute } from 'vue-router'
 import { computed, onMounted } from 'vue'
 
@@ -29,4 +30,5 @@ const showHeader = computed(() => {
 <template>
   <Header v-if="showHeader" />
   <router-view />
+   <Footer />
 </template>
