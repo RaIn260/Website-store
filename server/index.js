@@ -144,12 +144,27 @@ console.log('UPDATE ERROR:', error)
 
 // Получение всех товаров с бд
 app.get('/api/products', async (req, res) => {
-  const { data, error } = await supabase
-  .from('products')
-  .select('*')
-  .order('created_at', {ascending: false})  // сортировка по дате создания и убыванию
 
-  if(error) return res.status(400).json(error)
+  const { search } = req.query
+
+  console.log('SEARCH QUERY:', search)
+
+  let query = supabase
+    .from('products')
+    .select('*')
+
+  if (search) {
+    query = query.ilike('name', `%${search}%`)
+  }
+
+  const { data, error } = await query.order(
+    'created_at',
+    { ascending: false }
+  )
+
+  if (error) {
+    return res.status(400).json(error)
+  }
 
   res.json(data)
 })
@@ -227,15 +242,37 @@ app.post('/api/cart', authMiddleware, async (req, res) => {
   const userId = req.user.id
   const { product_id } = req.body
 
-  const { data: existing, error } = await supabase
-    .from('cart_items')
+// 1. получаем товар (чтобы знать stock)
+  const { data: product, error: productError } = await supabase
+    .from('products')
     .select('*')
-    .eq('user_id', userId)
-    .eq('product_id', product_id)
+    .eq('id', product_id)
+    .single()
+
+  if (productError) {
+    return res.status(400).json(productError)
+  }
+
+  // 2. ищем уже в корзине
+  const { data: existing, error } = await supabase
+   .from('cart_items')
+   .select('*')
+   .eq('user_id', userId)
+   .eq('product_id', product_id)
 
   if (error) return res.status(400).json(error)
 
-  if (existing.length > 0) {
+  const currentQty = existing.length > 0 ? existing[0].quantity : 0
+
+  // 3. проверка stock
+  if (currentQty + 1 > product.stock) {
+    return res.status(400).json({
+      message: 'Нет в наличии'
+    })
+  }
+
+  // 4. если уже есть → update
+  if (existing.length > 0) {  
     const { data, error } = await supabase
       .from('cart_items')
       .update({ quantity: existing[0].quantity + 1 })
@@ -245,6 +282,7 @@ app.post('/api/cart', authMiddleware, async (req, res) => {
     return res.json(data)
   }
 
+  // 5. иначе insert
   const { data, error: insertError } = await supabase
     .from('cart_items')
     .insert([
@@ -305,6 +343,23 @@ app.delete('/api/cart/:id', authMiddleware, async (req, res) => {
     success: true,
     deleted: data
   })
+})
+
+
+app.patch('/api/cart/:id', authMiddleware, async (req, res) => {
+
+  const { id } = req.params
+  const { quantity } = req.body
+
+  const { data, error } = await supabase
+    .from('cart_items')
+    .update({ quantity })
+    .eq('id', id)
+    .select()
+
+  if (error) return res.status(400).json(error)
+
+  res.json(data)
 })
 
 app.listen(3000, () => {

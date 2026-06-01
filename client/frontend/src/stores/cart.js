@@ -51,5 +51,7 @@ export const useCartStore = defineStore('cart', {
 
       this.cart = this.cart.filter(item => item.cart_id !== id)
     }
+
+    
   }
 })

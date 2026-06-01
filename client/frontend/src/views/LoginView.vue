@@ -59,7 +59,13 @@ const login = async () => {
       password.value
     )
 
-    router.push('/profile')
+    const user = authStore.user
+
+    if (user?.email === 'inna260607@gmail.com') {
+      router.push('/admin')
+    } else {
+      router.push('/profile')
+    }
 
   } catch {
 

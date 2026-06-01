@@ -9,6 +9,7 @@ import CatalogView from '../views/CatalogView.vue'
 import CartView from '../views/CartView.vue'
 import CheckoutView from '../views/CheckoutView.vue'
 import ProductView from '../views/ProductView.vue'
+import { isAdmin } from '../utils/admin'
 
 const routes = [
   { path: '/home', component: MainView },
@@ -18,7 +19,8 @@ const routes = [
   { path: '/catalog', component: CatalogView },
   { path: '/cart', component: CartView },
   { path: '/checkout', component: CheckoutView},
-  { path: '/product/:id', component: ProductView}
+  { path: '/product/:id', component: ProductView},
+  {path: '/admin', name: 'admin', component: () => import('../views/AdminView.vue'), meta: { requiresAdmin: true }}
 ]
 
 const router = createRouter({
@@ -27,11 +29,10 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-
   const authStore = useAuthStore()
 
+  // 🔐 AUTH CHECK
   if (to.meta.requiresAuth) {
-
     if (!authStore.token) {
       return next('/')
     }
@@ -39,13 +40,18 @@ router.beforeEach(async (to, from, next) => {
     if (!authStore.user) {
       await authStore.getMe()
     }
-
-    next()
-
-  } else {
-
-    next()
   }
+
+  // 👑 ADMIN CHECK
+  if (to.meta.requiresAdmin) {
+    const user = authStore.user || JSON.parse(localStorage.getItem('user'))
+
+    if (!user || !isAdmin(user)) {
+      return next('/')
+    }
+  }
+
+  next()
 })
 
 export default router

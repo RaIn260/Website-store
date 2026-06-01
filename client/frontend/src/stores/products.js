@@ -10,16 +10,21 @@ export const useProductsStore = defineStore('products', {
 
   actions: {
 
-    async fetchProducts() {
+    async fetchProducts(search = '') {
 
       try {
 
         this.loading = true
 
-        const res = await api.get('/api/products')
+        console.log('Отправляю запрос:', search)
 
+        const res = await api.get('/api/products',{params: {search}}
+        )
+
+
+        console.log('Ответ сервера:', res.data)
+        
         this.products = res.data
-
       } catch (err) {
 
         console.log(err)

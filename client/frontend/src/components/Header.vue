@@ -13,6 +13,9 @@
           Каталог
         </span>
 
+        <span v-if="authStore.isAdmin"  @click="$router.push('/admin')">
+          Админ-панель
+        </span>
       </nav>
 
       <!-- Правая часть -->
@@ -205,26 +208,4 @@ const goToLogin = () => {
 .login-btn:hover {
   background: #ff0015;
 }
-
-.search-input {
-  width: 300px;
-
-  padding: 10px 16px;
-
-  background: rgba(17, 17, 17, 0.95);
-
-  color: white;
-
-  border: 1px solid rgba(255, 0, 21, 0.25);
-  border-radius: 12px;
-
-  outline: none;
-
-  transition: .3s;
-
-  box-shadow:
-    0 0 15px rgba(255,0,21,.05),
-    inset 0 0 10px rgba(255,255,255,.03);
-}
-
 </style>
